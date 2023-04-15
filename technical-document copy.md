@@ -21,8 +21,8 @@ Another challenge is to collect and process data from multiple sources in real-t
     - Reason: ReactJS allows for the creation of fast, dynamic with reusable components client side rendering. And distributing it through AWS CloudFront provides a highly scalable and cost 
     effective solution for hosting and delivering static web content with low latency and high performance.
 
-- Decision: Build dockerized application for Web based back office administration
-    - Reason: Docker makes it easy to scale your application horizontally by creating additional containers to handle increased traffic or load.
+- Decision: Build dockerized application for Web based backend office administration
+    - Reason: Docker makes it easy to scale application horizontally by creating additional containers to handle increased traffic or load.
 
 - Decision: Select React Native for mobile application
     - Reason: Because React Native is cross-platform support, code reusability, performance, development speed
@@ -45,15 +45,15 @@ Another challenge is to collect and process data from multiple sources in real-t
         - No SQl Database: AWS DynamoDB (that provides fast and predictable performance, seamless scalability, and automatic data replication and backup.)
 
 - Decision: Use API Gateway communicate REST API/Websocket
-     - Reason: because its more secure, We can easily link with aws cognito pool, and lambda functions. can configure throttle rate. caching, can handle large amounts of traffic and can scale to support millions of API requests per second. and its offers several security features, including authentication and authorization, encryption, and protection against common web attacks such as cross-site scripting (XSS) and SQL injection.
+     - Reason: because its more secure, We can easily link with AWS Cognito pool, and lambda functions. can configure throttle rate. caching, can handle large amounts of traffic and can scale to support millions of API requests per second. and its offers several security features, including authentication and authorization, encryption, and protection against common web attacks such as cross-site scripting (XSS) and SQL injection.
 
 - Decision: Deploy on ECS Cluster
-    - Reason: ECS Cluster simplifies the management of containerized applications by providing a centralized platform for deployment, monitoring, and scaling. It also integrates with other AWS services such as EC2, ECR, and CloudWatch, making it easy to set up and manage your entire application stack.
+    - Reason: ECS Cluster simplifies the management of containerized applications by providing a centralized platform for deployment, monitoring, and scaling. It also integrates with other AWS services such as EC2, ECR, and CloudWatch, making it easy to set up and manage entire application stack.
     
 ### High Level Architecture Design
 The diagram belows shows the high level component diagram that could be used to fulfil the requirements.
 
-1. Web based back office administration application
+1. Web based backend office administration application
 2. Real time race tracker server
 3. Web based frontend user application
 4. Mobile application for tracking racers
@@ -62,7 +62,7 @@ Each of these components will be responsible for different aspects of the system
 
 ![High Level Architecture Diagram](/assets/System-Design-Digram-of-Bicycle-Racing-Platform.drawio.png)
 
-1. Back Office Administration Application:
+1. Backend Office Administration Application:
     - The application will be responsible for managing users, creating new races, and viewing statistics from past races. The application should be connected to a database to store user information and race data. The database could be a relational database Aurora MySQL and NoSQL db line AWS DynamoDB.
         - Cloud Services 
             - This application deployed on AWS ECS Fargate Cluster
@@ -80,6 +80,7 @@ Each of these components will be responsible for different aspects of the system
             - REST APIs and Websocket are serve through AWS API Gateway
             - S3 Bucket
             - Cloud Front for distribution
+            
 3. Real-time Race Tracker Server:
     - This Websocket application will be responsible for collecting data from the mobile application and distributing it to all spectators watching the race in the frontend user application. 
         - Cloud Service
@@ -90,9 +91,10 @@ Each of these components will be responsible for different aspects of the system
         - CloudWatch to setup monitoring save application and deployment logs
 
 ### Technology Stack
+
 The proposed technology stack for each component is as follows:
 
-1. Web-based Back-office Administration Application:
+1. Web-based backend office Administration Application:
     - Language: PHP 
     - Framework: Laravel
     - Database: Aurora MySQL
@@ -107,7 +109,6 @@ The proposed technology stack for each component is as follows:
     - Language: JavaScript
     - Framework: ServerlessJS, Deployed on AWS Lambda
 
-## 
 ## Deployment plan
 
 ##### Deployment plan utilizes below service 
@@ -115,7 +116,7 @@ The proposed technology stack for each component is as follows:
 - Docker
 - AWS Environment
 - GitHub Actions (CI/CD) 
-- Cloud Formation Infrastructure as Code (IaC) tools
+- Cloud Formation Infrastructure as Code (IaC)
 - App Store and Play Store for a React Native application
 
 Each repository must handle four different branches, namely development, stage, production, and features. The development branch should be linked to the development environment, while the stage branch should be linked to the stage environment, and the production branch should be linked to the production environment. 
@@ -125,12 +126,12 @@ All merge requests to the main branches must be reviewed through a pull request 
 **Web-based Frontend User Application via GitHub Action**
 - Build push to the S3 bucket  --> Invalidate CloudFront --> Deployment success or fail trigger via notification channel.
 
-**Back Office Administration Application via GitHub Action**
+**Backend Office Administration Application via GitHub Action**
 - Build docker image and push to the AWS ECR -> Push to to ECS --> Deployment success or fail trigger via notification channel.
 
 #### Guideline
 - Initiate project repositories on GitHub 
-    - Back Office Administration Application
+    - backend Office Administration Application
     - Web-based Frontend User Application
     - Mobile Application 
     - Real-time Race Tracker applications for 3 lambda function
@@ -150,15 +151,15 @@ All merge requests to the main branches must be reviewed through a pull request 
 
 Sharing a cost analysis based on a request rate of 1000 requests per second and 10,000 requests per second.
 
-- Lets assume system get Request 1000/1Sec :
+- Assuming the system receives 1,000 requests per second:
     - Monthly: 394.81 USD
     - Annually: 4,917.72 USD
-    - Detail Estimation : https://calculator.aws/#/estimate?id=2f7badf2aa453d89a4dd93dbb8c8765214123705
+    - Details Estimation Breakdown: https://calculator.aws/#/estimate?id=2f7badf2aa453d89a4dd93dbb8c8765214123705
 
-- Lets assume system get Request 10000/1Sec: 
+- Assuming the system receives 10,000 requests per second:
     - Monthly: 628.97 USD
     - Annually: 7,727.64 USD
-    - Detail Estimation : https://calculator.aws/#/estimate?id=a7775372071497dc3d0dfde4eeae0f9a34a14500
+    - Details Estimation Breakdown: https://calculator.aws/#/estimate?id=a7775372071497dc3d0dfde4eeae0f9a34a14500
 
 
 
