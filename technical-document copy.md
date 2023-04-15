@@ -5,15 +5,15 @@
 This product serves the purpose of managing and organizing bicycle races, while also enabling the tracking and scoring of individual athletes in each race. Additionally, it provides real-time updates on the race status and the live positions of all competitors.
 
 ## Biggest Challenges
-One of the biggest technical challenges that this system faces is handling large number of consumers and scaling the system load. This challenge can be addressed by using microservices, Event driven architecture, which allows us to break down the system into smaller, more manageable components.
+One of the biggest technical challenges that this system faces is handling large number of consumers and scaling the system load. This challenge can be addressed by using manage services, microservices, Event driven architecture, which allows us to break down the system into smaller, more manageable components.
 
-Another challenge is to collect and process data from multiple sources in real-time. This can be addressed by implementing a real-time data processing pipeline that can ingest data from multiple sources and process them in real-time
+Another challenge is to collect and process data from multiple sources in real-time. This can be addressed by implementing a real-time data processing pipeline that can ingest data from multiple sources and process them in real-time. This challenge can be addressed
 
    - Scalability: The system infrastructure should be designed to use load balancing, caching, and horizontally auto-scaling technologies. also frontend website store deploy in bucket and distributed via AWS CloudFront
    - Database/Storage: The system should use a combination of relational and NoSQL databases. 
         - Relational databases can be used to store user information and race data, 
         - Non Relational databases can be used to store real-time race data.
-   - Real time Data Feed: Mobile application should be designed to use GPS technology (get Latitude and longitude) and a reliable data transfer protocol such as WebSockets or RTCP.
+   - Real time Data Feed: Mobile application should be designed to use GPS technology (get Latitude and longitude) and a reliable data transfer protocol such as WebSockets.
 
 ## Technical Decisions
 
@@ -28,17 +28,17 @@ Another challenge is to collect and process data from multiple sources in real-t
     - Reason: Because React Native is cross-platform support, code reusability, performance, development speed
 
 - Decision: Select AWS Lambda functions with ServelessJS framwork for real time race tracker
-    - Reason: Because AWS Lambda functions with the ServerlessJS framework is cost effective for these kind of solutions
+    - Reason: Because AWS Lambda functions with the ServerlessJS framework is cost effective for these kind of low latency solutions
+   
+- Decision: Use AWS SQS (FIFO)
+    - Reason: when Lambda function receives a message from websocket, it can send it to an SQS (FIFO) queue, where it will be stored temporarily until it can be processed by the database store process. The database store process can then consume the messages from the queue in the order they were received, ensuring that messages are processed in the correct order
+    
+- Decision: Use AWS Cognito use as customer identity and access management (CIAM) throughout the system
+    - Reason: AWS Cognito is a fully managed service that can scale to support large number of users without requiring any infrastructure management and Its easy to integrate with AWS API Gateway also it has social logins and MAF in build 
 
 - Decision: Implement ETL process using Lambda function 
     - Reason: This function trigger based on schedule to do ETL process store DynamoDB data to Aurora MySQL DB
-    
-- Decision: Use AWS SQS (FIFO)
-    - Reason: when Lambda function receives a message, it can send it to an SQS (FIFO) queue, where it will be stored temporarily until it can be processed by the database store process. The database store process can then consume the messages from the queue in the order they were received, ensuring that messages are processed in the correct order
-    
-- Decision: Use AWS Cognito use as customer identity and access management (CIAM) throwout the system
-    - Reason: AWS Cognito is a fully managed service that can scale to support large number of users without requiring any infrastructure management and Its easy to integrate with AWS API Gateway also it has social logins and MAF in build 
-
+ 
 - Decision: Select two databases for this system
     - Reason: Considering behavior of the system Its better to go with Relational Database and Non Relational Database
         - Relational Database Management: Aurora MySQL
@@ -63,7 +63,7 @@ Each of these components will be responsible for different aspects of the system
 ![High Level Architecture Diagram](/assets/System-Design-Digram-of-Bicycle-Racing-Platform.drawio.png)
 
 1. Back Office Administration Application:
-    - The application will be responsible for managing users, creating new races, and viewing statistics from past races. The application should be connected to a database to store user information and race data. The database could be a relational database such as MySQL and NoSQL db line AWS DynamoDB.
+    - The application will be responsible for managing users, creating new races, and viewing statistics from past races. The application should be connected to a database to store user information and race data. The database could be a relational database Aurora MySQL and NoSQL db line AWS DynamoDB.
         - Cloud Services 
             - This application deployed on AWS ECS Fargate Cluster
             - REST APIs and Websocket are serve through AWS API Gateway 
@@ -81,7 +81,7 @@ Each of these components will be responsible for different aspects of the system
             - S3 Bucket
             - Cloud Front for distribution
 3. Real-time Race Tracker Server:
-    - The application will be responsible for collecting data from the mobile application and distributing it to all spectators watching the race in the frontend user application. 
+    - This Websocket application will be responsible for collecting data from the mobile application and distributing it to all spectators watching the race in the frontend user application. 
         - Cloud Service
         - AWS Lambda
         - AWS API Gateway for websocket endpoint of a two-way communication link.
@@ -95,11 +95,11 @@ The proposed technology stack for each component is as follows:
 1. Web-based Back-office Administration Application:
     - Language: PHP 
     - Framework: Laravel
-    - Database: MySQL
+    - Database: Aurora MySQL
 2. Web-based Frontend User Application:
     - Language: JavaScript
     - Framework: ReactJS
-    - Database: REST API
+    - API: REST API / Web Socket
 3. Mobile Application for Tracking Racers:
     - Language: JavaScript
     - Framework: ReactNative
@@ -107,6 +107,7 @@ The proposed technology stack for each component is as follows:
     - Language: JavaScript
     - Framework: ServerlessJS, Deployed on AWS Lambda
 
+## 
 ## Deployment plan
 
 ##### Deployment plan utilizes below service 
