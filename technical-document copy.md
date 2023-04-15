@@ -5,18 +5,51 @@
 This product serves the purpose of managing and organizing bicycle races, while also enabling the tracking and scoring of individual athletes in each race. Additionally, it provides real-time updates on the race status and the live positions of all competitors.
 
 ## Biggest Challenges
-One of the biggest technical challenges that this system faces is handling x number of consumers and scaling the system load. This challenge can be addressed by using microservices, Event driven architecture, which allows us to break down the system into smaller, more manageable components.
+One of the biggest technical challenges that this system faces is handling large number of consumers and scaling the system load. This challenge can be addressed by using microservices, Event driven architecture, which allows us to break down the system into smaller, more manageable components.
 
 Another challenge is to collect and process data from multiple sources in real-time. This can be addressed by implementing a real-time data processing pipeline that can ingest data from multiple sources and process them in real-time
 
-1. Scalability: The system infrastructure should be designed to use load balancing, caching, and horizontally auto-scaling technologies. also frontend website store deploy in bucket and distributed via AWS CloudFront
-2. Database/Storage: The system should use a combination of relational and NoSQL databases. Relational databases can be used to store user information and race data, while NoSQL databases can be used to store real-time race data.
-3. Real time Data Feed: Mobile application should be designed to use GPS technology (get Latitude and longitude) and a reliable data transfer protocol such as WebSockets or RTCP.
-
-*[TODO: Please use this section to identify the biggest challenges that you see and solutions that you would implement for them]*
+   - Scalability: The system infrastructure should be designed to use load balancing, caching, and horizontally auto-scaling technologies. also frontend website store deploy in bucket and distributed via AWS CloudFront
+   - Database/Storage: The system should use a combination of relational and NoSQL databases. 
+        - Relational databases can be used to store user information and race data, 
+        - Non Relational databases can be used to store real-time race data.
+   - Real time Data Feed: Mobile application should be designed to use GPS technology (get Latitude and longitude) and a reliable data transfer protocol such as WebSockets or RTCP.
 
 ## Technical Decisions
 
+- Decision: Web based frontend user application build using ReactJS and deploy on AWS S3 and distributed through AWS CloudFront 
+    - Reason: ReactJS allows for the creation of fast, dynamic with reusable components client side rendering. And distributing it through AWS CloudFront provides a highly scalable and cost 
+    effective solution for hosting and delivering static web content with low latency and high performance.
+
+- Decision: Build dockerized application for Web based back office administration
+    - Reason: Docker makes it easy to scale your application horizontally by creating additional containers to handle increased traffic or load.
+
+- Decision: Select React Native for mobile application
+    - Reason: Because React Native is cross-platform support, code reusability, performance, development speed
+
+- Decision: Select AWS Lambda functions with ServelessJS framwork for real time race tracker
+    - Reason: Because AWS Lambda functions with the ServerlessJS framework is cost effective for these kind of solutions
+
+- Decision: Implement ETL process using Lambda function 
+    - Reason: This function trigger based on schedule to do ETL process store DynamoDB data to Aurora MySQL DB
+    
+- Decision: Use AWS SQS (FIFO)
+    - Reason: when Lambda function receives a message, it can send it to an SQS (FIFO) queue, where it will be stored temporarily until it can be processed by the database store process. The database store process can then consume the messages from the queue in the order they were received, ensuring that messages are processed in the correct order
+    
+- Decision: Use AWS Cognito use as customer identity and access management (CIAM) throwout the system
+    - Reason: AWS Cognito is a fully managed service that can scale to support large number of users without requiring any infrastructure management and Its easy to integrate with AWS API Gateway also it has social logins and MAF in build 
+
+- Decision: Select two databases for this system
+    - Reason: Considering behavior of the system Its better to go with Relational Database and Non Relational Database
+        - Relational Database Management: Aurora MySQL
+        - No SQl Database: AWS DynamoDB (that provides fast and predictable performance, seamless scalability, and automatic data replication and backup.)
+
+- Decision: Use API Gateway communicate REST API/Websocket
+     - Reason: because its more secure, We can easily link with aws cognito pool, and lambda functions. can configure throttle rate. caching, can handle large amounts of traffic and can scale to support millions of API requests per second. and its offers several security features, including authentication and authorization, encryption, and protection against common web attacks such as cross-site scripting (XSS) and SQL injection.
+
+- Decision: Deploy on ECS Cluster
+    - Reason: ECS Cluster simplifies the management of containerized applications by providing a centralized platform for deployment, monitoring, and scaling. It also integrates with other AWS services such as EC2, ECR, and CloudWatch, making it easy to set up and manage your entire application stack.
+    
 ### High Level Architecture Design
 The diagram belows shows the high level component diagram that could be used to fulfil the requirements.
 
@@ -72,19 +105,59 @@ The proposed technology stack for each component is as follows:
     - Framework: ReactNative
 4. Real-time Race Tracker Server:
     - Language: JavaScript
-    - Framework: Serverless JS 
+    - Framework: ServerlessJS, Deployed on AWS Lambda
 
 ## Deployment plan
 
-3. Mobile Application:
-The mobile application should be built for both iOS and Android devices using native mobile development frameworks such as Swift and Kotlin. The application will be responsible for tracking the current position of the racer and sending it to the real-time server. The mobile application should use OAuth2 authentication protocol to ensure only registered users can access the application. The application will also need to use GPS technology to track the racer's position.
+#####Deployment plan utilizes below service 
+- GitHub 
+- Docker
+- AWS Environment
+- GitHub Actions (CI/CD) 
+- Cloud Formation Infrastructure as Code (IaC) tools
+- App Store and Play Store for a React Native application
 
+Each repository must handle four different branches, namely development, stage, production, and features. The development branch should be linked to the development environment, while the stage branch should be linked to the stage environment, and the production branch should be linked to the production environment. 
+
+All merge requests to the main branches must be reviewed through a pull request process.
+
+**Web-based Frontend User Application via GitHub Action**
+- Build push to the S3 bucket  --> Invalidate CloudFront --> Deployment success or fail trigger via notification channel.
+
+**Back Office Administration Application via GitHub Action**
+- Build docker image and push to the AWS ECR -> Push to to ECS --> Deployment success or fail trigger via notification channel.
+
+####Guideline
+- Initiate project repositories on GitHub 
+    - Back Office Administration Application
+    - Web-based Frontend User Application
+    - Mobile Application 
+    - Real-time Race Tracker applications for 3 lambda function
+
+- Build Infrastructure using AWS Cloud formation
+    - Write CF scripts for build all infrastructure items AWS VPC, ALB, ECR, ECS, RDS, API Gateway etc. 
+
+- Write GitHub Actions Scripts for (CI/CD) :
+    - Set up a GitHub Actions workflow to automate CI/CD process. 
+
+- Build React Native application deploy to a relevant environment
+
+- Set up monitoring and alerts:
+    - Use a combination of monitoring tools AWS CloudWatch, Sentry.io, for incident notification use such as AWS SNS, Slack.
 
 ## Runtime Cost Analysis
 
+Sharing a cost analysis based on a request rate of 1000 requests per second and 10,000 requests per second.
 
+- Lets assume system get Request 1000/1Sec :
+    - Monthly: 394.81 USD
+    - Annually: 4,917.72 USD
+    - Detail Estimation : https://calculator.aws/#/estimate?id=2f7badf2aa453d89a4dd93dbb8c8765214123705
 
-
+- Lets assume system get Request 10000/1Sec: 
+    - Monthly: 394.81 USD
+    - Annually: 4,917.72 USD
+    - Detail Estimation : https://calculator.aws/#/estimate?id=a7775372071497dc3d0dfde4eeae0f9a34a14500
 
 
 
