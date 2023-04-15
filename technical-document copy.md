@@ -109,7 +109,7 @@ The proposed technology stack for each component is as follows:
 
 ## Deployment plan
 
-#####Deployment plan utilizes below service 
+##### Deployment plan utilizes below service 
 - GitHub 
 - Docker
 - AWS Environment
@@ -127,7 +127,7 @@ All merge requests to the main branches must be reviewed through a pull request 
 **Back Office Administration Application via GitHub Action**
 - Build docker image and push to the AWS ECR -> Push to to ECS --> Deployment success or fail trigger via notification channel.
 
-####Guideline
+#### Guideline
 - Initiate project repositories on GitHub 
     - Back Office Administration Application
     - Web-based Frontend User Application
