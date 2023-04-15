@@ -155,8 +155,8 @@ Sharing a cost analysis based on a request rate of 1000 requests per second and 
     - Detail Estimation : https://calculator.aws/#/estimate?id=2f7badf2aa453d89a4dd93dbb8c8765214123705
 
 - Lets assume system get Request 10000/1Sec: 
-    - Monthly: 394.81 USD
-    - Annually: 4,917.72 USD
+    - Monthly: 628.97 USD
+    - Annually: 7,727.64 USD
     - Detail Estimation : https://calculator.aws/#/estimate?id=a7775372071497dc3d0dfde4eeae0f9a34a14500
 
 
